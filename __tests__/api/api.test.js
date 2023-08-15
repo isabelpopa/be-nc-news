@@ -95,6 +95,15 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
+  test("400: responds with a status of 400 and a custom message of Bad request", () => {
+    return request(app)
+      .get("/api/articles/banana")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
   test("404: responds with a status of 404 and a custom message of Article_id Not Found", () => {
     return request(app)
       .get("/api/articles/99")
