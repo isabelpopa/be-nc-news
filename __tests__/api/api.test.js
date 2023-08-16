@@ -166,6 +166,70 @@ describe("GET /api/articles", () => {
   });
 });
 
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: responds with a status of 200 and an object representing article_id 1", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id", expect.any(Number));
+          expect(comment).toHaveProperty("votes", expect.any(Number));
+          expect(comment).toHaveProperty("created_at", expect.any(String));
+          expect(comment).toHaveProperty("author", expect.any(String));
+          expect(comment).toHaveProperty("body", expect.any(String));
+          expect(comment).toHaveProperty("article_id", expect.any(Number));
+          expect(comments[0]).toMatchObject({
+            comment_id: 5,
+            body: "I hate streaming noses",
+            votes: 0,
+            author: "icellusedkars",
+            article_id: 1,
+            created_at: "2020-11-03T21:00:00.000Z",
+          });
+        });
+      });
+  });
+  test("200: Returns 200 when article_id exists but the comments array is empty", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
+      });
+  });
+  test("Comments should be sorted by most recent comments first.", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy('created_at', {descending: true});
+      });
+  });
+  test("400: responds with a status of 400 and a custom message of Bad request", () => {
+    return request(app)
+      .get("/api/articles/banana/comments")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: responds with a status of 404 and a custom message of Article_id Not Found", () => {
+    return request(app)
+      .get("/api/articles/99/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Article_id Not Found");
+      });
+  });
+});
+
 describe("ALL /notapath", () => {
   test("404: responds with a status of 404 and a custom message when the path is not found", () => {
     return request(app)
