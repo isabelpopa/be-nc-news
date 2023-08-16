@@ -166,7 +166,7 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe("GET /api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   test("200: responds with a status of 200 and an object representing article_id 1", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -191,6 +191,15 @@ describe("GET /api/articles/:article_id", () => {
             created_at: "2020-11-03T21:00:00.000Z",
           });
         });
+      });
+  });
+  test("200: Returns 200 when article_id exists but the comments array is empty", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
       });
   });
   test("Comments should be sorted by most recent comments first.", () => {
