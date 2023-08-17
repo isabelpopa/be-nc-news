@@ -151,7 +151,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toBeSortedBy('created_at', {descending: true});
+        expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
   test("Articles should not have a body property present on any of the article objects", () => {
@@ -207,7 +207,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .then(({ body }) => {
         const { comments } = body;
-        expect(comments).toBeSortedBy('created_at', {descending: true});
+        expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
   test("400: responds with a status of 400 and a custom message of Bad request", () => {
@@ -230,14 +230,105 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("ALL /notapath", () => {
-  test("404: responds with a status of 404 and a custom message when the path is not found", () => {
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: responds with a status of 201 and the comment object that has been sent", () => {
+    const newComment = {
+      body: "The answer is doughnuts",
+      username: "butter_bridge",
+    };
     return request(app)
-      .get("/api/banana")
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment).toMatchObject({
+          article_id: 1,
+          author: "butter_bridge",
+          body: "The answer is doughnuts",
+          votes: 0,
+          ...comment
+        });
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+        expect(comment).toHaveProperty("votes", expect.any(Number));
+        expect(comment).toHaveProperty("body", expect.any(String));
+        expect(comment).toHaveProperty("author", expect.any(String));
+        expect(comment).toHaveProperty("article_id", expect.any(Number));
+      });
+  });
+  test("400: Should return Bad request when the comment has a malformed body", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Username Not Found' when the comment is missing username field", () => {
+    const newComment = {
+      body: "The answer is doughnuts",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Username Not Found");
+      });
+  });
+  test("400: Should return 'Comment Not Found' when the comment is missing comment field", () => {
+    const newComment = {
+      username: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Comment Not Found");
+      });
+  });
+  test("400: Should return 'Bad request' when the article_id is invalid", () => {
+    const newComment = {
+      body: "The answer is doughnuts",
+      username: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/banana/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
+    const newComment = {
+      body: "The answer is doughnuts",
+      username: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send(newComment)
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Not found");
+        expect(msg).toBe("Not Found");
       });
+  });
+  describe("ALL /notapath", () => {
+    test("404: responds with a status of 404 and a custom message when the path is not found", () => {
+      return request(app)
+        .get("/api/banana")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not found");
+        });
+    });
   });
 });

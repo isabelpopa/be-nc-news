@@ -1,8 +1,10 @@
 const handle400s = ((err, request, response, next) => {
-    //console.log(err, "Non-custom error");
     if (err.code === '23502' || err.code === '22P02') {
         response.status(400).send({msg: 'Bad request'});
-    } else {
+    } else if ( err.code === '23503' ){
+        response.status(404).send({msg: 'Not Found'});
+    } 
+    else {
         next(err);
     }
 })

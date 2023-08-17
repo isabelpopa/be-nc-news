@@ -1,11 +1,22 @@
 const express = require("express");
 const { getAllTopics } = require("./controllers/topics.controllers");
-const { handle400s, handleCustomErrors } = require("./controllers/error.controllers");
+const {
+  handle400s,
+  handleCustomErrors,
+} = require("./controllers/error.controllers");
 const { getAllApiEndpoints } = require("./controllers/api.controllers");
-const { getArticleById, getAllArticles } = require("./controllers/articles.controllers");
-const { getAllCommentsByArticleId } = require("./controllers/comments.controllers");
+const {
+  getArticleById,
+  getAllArticles,
+} = require("./controllers/articles.controllers");
+const {
+  getAllCommentsByArticleId,
+  postComment,
+} = require("./controllers/comments.controllers");
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/api/topics", getAllTopics);
 
@@ -17,11 +28,13 @@ app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id/comments", getAllCommentsByArticleId);
 
-app.use((_, response) => {
-    response.status(404).send({msg: "Not found"})
-})
+app.post("/api/articles/:article_id/comments", postComment);
 
-app.use(handle400s)
+app.use((_, response) => {
+  response.status(404).send({ msg: "Not found" });
+});
+
+app.use(handle400s);
 
 app.use(handleCustomErrors);
 
