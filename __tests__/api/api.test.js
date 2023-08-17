@@ -247,7 +247,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           author: "butter_bridge",
           body: "The answer is doughnuts",
           votes: 0,
-          ...comment
+          ...comment,
         });
         expect(comment).toHaveProperty("created_at", expect.any(String));
         expect(comment).toHaveProperty("votes", expect.any(Number));
@@ -320,15 +320,96 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Not Found");
       });
   });
-  describe("ALL /notapath", () => {
-    test("404: responds with a status of 404 and a custom message when the path is not found", () => {
-      return request(app)
-        .get("/api/banana")
-        .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Not found");
+});
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: responds with a status of 200 and the updated article object that has been patched", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article).toMatchObject({
+          votes: 110,
+          ...article,
         });
-    });
+        expect(article.votes).toBe(110);
+        expect(article).toHaveProperty("title", expect.any(String));
+        expect(article).toHaveProperty("topic", expect.any(String));
+        expect(article).toHaveProperty("author", expect.any(String));
+        expect(article).toHaveProperty("body", expect.any(String));
+        expect(article).toHaveProperty("created_at", expect.any(String));
+        expect(article).toHaveProperty("votes", expect.any(Number));
+        expect(article).toHaveProperty("article_img_url", expect.any(String));
+        expect(article).toHaveProperty("article_id", expect.any(Number));
+      });
+  });
+  test("200: responds with the patched votes, when subtracting a value", () => {
+    const patchedArticle = { inc_votes: -50 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(50);
+      });
+  });
+  test("400: Should return 'Bad request' when the patch has a malformed body", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Bad request' when the patch is not a number", () => {
+    const patchedArticle = {
+      votes: "banana",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Bad request' when the article_id is invalid", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/banana")
+      .send(patchedArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/999")
+      .send(patchedArticle)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Article_id Not Found");
+      });
+  });
+});
+describe("ALL /notapath", () => {
+  test("404: responds with a status of 404 and a custom message when the path is not found", () => {
+    return request(app)
+      .get("/api/banana")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not Found");
+      });
   });
 });
