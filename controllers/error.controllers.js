@@ -1,6 +1,6 @@
 const handle400s = ((err, request, response, next) => {
     if (err.code === '23502' || err.code === '22P02') {
-        response.status(400).send({msg: 'Bad request'});
+        response.status(400).send({msg: 'Bad Request'});
     } else if ( err.code === '23503' ){
         response.status(404).send({msg: 'Not Found'});
     } 
