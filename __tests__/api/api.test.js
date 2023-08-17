@@ -247,7 +247,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           author: "butter_bridge",
           body: "The answer is doughnuts",
           votes: 0,
-          ...comment
+          ...comment,
         });
         expect(comment).toHaveProperty("created_at", expect.any(String));
         expect(comment).toHaveProperty("votes", expect.any(Number));
@@ -320,15 +320,45 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Not Found");
       });
   });
-  describe("ALL /notapath", () => {
-    test("404: responds with a status of 404 and a custom message when the path is not found", () => {
-      return request(app)
-        .get("/api/banana")
-        .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Not found");
+});
+describe("GET /api/users", () => {
+  test("200: responds with a status of 200", () => {
+    return request(app).get("/api/users").expect(200);
+  });
+
+  test("200: responds with an array of users on the body", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
         });
+      });
+  });
+  test("404: responds with a status of 404 Not Found", () => {
+    return request(app)
+    .get("/api/usersss")
+    .expect(404)
+    .then(({ body }) => {
+      const { msg } = body;
+      expect(msg).toBe("Not Found");
     });
+  });
+});
+describe("ALL /notapath", () => {
+  test("404: responds with a status of 404 and a custom message when the path is not found", () => {
+    return request(app)
+      .get("/api/banana")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not Found");
+      });
   });
 });
