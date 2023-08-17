@@ -234,7 +234,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   test("201: responds with a status of 201 and the comment object that has been sent", () => {
     const newComment = {
       body: "The answer is doughnuts",
-      username: "butter_bridge"
+      username: "butter_bridge",
     };
     return request(app)
       .post("/api/articles/1/comments")
@@ -242,12 +242,18 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(201)
       .then((response) => {
         const { comment } = response.body;
-        expect(comment).toEqual({
+        expect(comment).toMatchObject({
           article_id: 1,
           author: "butter_bridge",
           body: "The answer is doughnuts",
+          votes: 0,
           ...comment
         });
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+        expect(comment).toHaveProperty("votes", expect.any(Number));
+        expect(comment).toHaveProperty("body", expect.any(String));
+        expect(comment).toHaveProperty("author", expect.any(String));
+        expect(comment).toHaveProperty("article_id", expect.any(Number));
       });
   });
   test("400: Should return Bad request when the comment has a malformed body", () => {
@@ -262,7 +268,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   test("400: Should return 'Username Not Found' when the comment is missing username field", () => {
     const newComment = {
-      body: "The answer is doughnuts"
+      body: "The answer is doughnuts",
     };
     return request(app)
       .post("/api/articles/1/comments")
@@ -275,7 +281,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   test("400: Should return 'Comment Not Found' when the comment is missing comment field", () => {
     const newComment = {
-      username: "butter_bridge"
+      username: "butter_bridge",
     };
     return request(app)
       .post("/api/articles/1/comments")
@@ -286,10 +292,10 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Comment Not Found");
       });
   });
-  test("400: Should return 'Bad request' when the article_id is banana", () => {
+  test("400: Should return 'Bad request' when the article_id is invalid", () => {
     const newComment = {
       body: "The answer is doughnuts",
-      username: "butter_bridge"
+      username: "butter_bridge",
     };
     return request(app)
       .post("/api/articles/banana/comments")
@@ -298,6 +304,20 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
+    const newComment = {
+      body: "The answer is doughnuts",
+      username: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not Found");
       });
   });
   describe("ALL /notapath", () => {
