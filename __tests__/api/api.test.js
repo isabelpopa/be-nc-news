@@ -331,18 +331,15 @@ describe("PATCH /api/articles/:article_id", () => {
       .then((response) => {
         const { article } = response.body;
         expect(article).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
           votes: 110,
-          ...article,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
-        expect(article.votes).toBe(110);
-        expect(article).toHaveProperty("title", expect.any(String));
-        expect(article).toHaveProperty("topic", expect.any(String));
-        expect(article).toHaveProperty("author", expect.any(String));
-        expect(article).toHaveProperty("body", expect.any(String));
-        expect(article).toHaveProperty("created_at", expect.any(String));
-        expect(article).toHaveProperty("votes", expect.any(Number));
-        expect(article).toHaveProperty("article_img_url", expect.any(String));
-        expect(article).toHaveProperty("article_id", expect.any(Number));
       });
   });
   test("200: responds with the patched votes, when subtracting a value", () => {

@@ -52,7 +52,7 @@ exports.patchArticle = (article_id, patchedArticle) => {
           msg: "Article_id Not Found",
         });
       } else {
-        return rows[0];
+        return article;
       }
   });
   };
