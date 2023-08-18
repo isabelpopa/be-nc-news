@@ -349,7 +349,8 @@ describe("GET /api/users", () => {
       const { msg } = body;
       expect(msg).toBe("Not Found");
     });
-
+  });
+});
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: responds with a status of 204", () => {
     return request(app).delete("/api/comments/1").expect(204);
@@ -370,7 +371,9 @@ describe("DELETE /api/comments/:comment_id", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Bad Request");
-      
+      });
+  });
+});
 describe("PATCH /api/articles/:article_id", () => {
   test("200: responds with a status of 200 and the updated article object that has been patched", () => {
     const patchedArticle = { inc_votes: 10 };
