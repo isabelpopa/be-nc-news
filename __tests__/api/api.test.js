@@ -169,11 +169,22 @@ describe("FEATURE: GET /api/articles (queries)", () => {
   test("Articles should be filtered by topic=mitch, sorted by author and ordered ascending ", () => {
     return request(app)
       .get("/api/articles?topic=mitch&sort_by=author&order=asc")
+      .expect(200)
       .then(({ body }) => {
         const { articles } = body;
+        expect(articles).toHaveLength(12);
         expect(articles).toBeSortedBy("author", { descending: false });
         articles.forEach((article) => {
-          expect(article).toHaveProperty("topic", "mitch");
+          expect(article).toEqual(expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            comment_count: expect.any(String),
+            topic: expect.any(String),
+            votes: expect.any(Number),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+          }))
         });
         expect(articles[0]).toStrictEqual({
             article_id: 1,
@@ -191,8 +202,10 @@ describe("FEATURE: GET /api/articles (queries)", () => {
   test("Articles should be filtered by topic=cats, sorted by votes and ordered descending by default ", () => {
     return request(app)
       .get("/api/articles?topic=cats&sort_by=votes")
+      .expect(200)
       .then(({ body }) => {
         const { articles } = body;
+        expect(articles).toHaveLength(1);
         expect(articles).toBeSortedBy("votes", { descending: true });
         articles.forEach((article) => {
           expect(article).toHaveProperty("topic", "cats");
@@ -210,27 +223,37 @@ describe("FEATURE: GET /api/articles (queries)", () => {
         })
       });
   });
-  test("400: responds with 400 and 'Bad sort_by request'", () => {
+  test("200: responds with 200 and an empty array when topic has no articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toEqual([]);
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("400: responds with 400 and 'Bad sort_by Request' when sort_by is invalid", () => {
     return request(app)
       .get("/api/articles?sort_by=banana")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad sort_by request");
+        expect(msg).toBe("Bad sort_by Request");
       });
   });
-  test("400: responds with 400 and 'Bad topic request'", () => {
+  test("400: responds with 400 and 'Bad order Request' when order is invalid", () => {
     return request(app)
-      .get("/api/articles?topic=banana")
+      .get("/api/articles?order=banana")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad topic request");
+        expect(msg).toBe("Bad order Request");
       });
   });
-  test("404: responds with 404 and 'Not Found' when topic is valid but not found", () => {
+  test("404: responds with 404 and 'Not Found' when topic is not found", () => {
     return request(app)
-      .get("/api/articles?topic=coding")
+      .get("/api/articles?topic=banana")
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
