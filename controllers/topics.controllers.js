@@ -2,11 +2,11 @@ const { request } = require("express");
 const { selectTopics } = require("../models/topics.models");
 
 exports.getAllTopics = (request, response, next) => {
-    selectTopics()
+  selectTopics()
     .then((topics) => {
-        response.status(200).send({ topics })
+      response.status(200).send({ topics });
     })
     .catch((err) => {
-        next(err)
-    })
+      next(err);
+    });
 };

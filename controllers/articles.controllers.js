@@ -1,5 +1,9 @@
 const { request } = require("express");
-const { selectArticle, selectArticles, patchArticle } = require("../models/articles.models");
+const {
+  selectArticle,
+  selectArticles,
+  patchArticle,
+} = require("../models/articles.models");
 
 exports.getArticleById = (request, response, next) => {
   const { article_id } = request.params;
@@ -32,5 +36,3 @@ exports.patchArticleById = (request, response, next) => {
       next(err);
     });
 };
-
-

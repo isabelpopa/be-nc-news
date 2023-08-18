@@ -1,7 +1,7 @@
 const {
   selectCommentsByArticleId,
   addComment,
-  deleteComment
+  deleteComment,
 } = require("../models/comments.models");
 const { selectArticle } = require("../models/articles.models");
 

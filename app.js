@@ -8,12 +8,12 @@ const { getAllApiEndpoints } = require("./controllers/api.controllers");
 const {
   getArticleById,
   getAllArticles,
-  patchArticleById
+  patchArticleById,
 } = require("./controllers/articles.controllers");
 const {
   getAllCommentsByArticleId,
   postComment,
-  deleteCommentById
+  deleteCommentById,
 } = require("./controllers/comments.controllers");
 const { getAllUsers } = require("./controllers/users.controllers");
 
