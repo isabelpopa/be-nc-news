@@ -35,3 +35,24 @@ exports.selectArticles = () => {
       }
     });
   };
+exports.patchArticle = (article_id, patchedArticle) => {
+    const { inc_votes } = patchedArticle;
+    const queryStr = format(`UPDATE articles SET votes = votes + %L WHERE article_id = %L RETURNING *;`, inc_votes, article_id);
+    if (!inc_votes || !article_id) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad request",
+      });
+    }
+  return db.query(queryStr).then(({ rows }) => {
+    const article = rows[0];
+      if (!article) {
+        return Promise.reject({
+          status: 404,
+          msg: "Article_id Not Found",
+        });
+      } else {
+        return article;
+      }
+  });
+  };

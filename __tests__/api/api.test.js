@@ -341,6 +341,81 @@ describe("DELETE /api/comments/:comment_id", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Bad Request");
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: responds with a status of 200 and the updated article object that has been patched", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 110,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("200: responds with the patched votes, when subtracting a value", () => {
+    const patchedArticle = { inc_votes: -50 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(50);
+      });
+  });
+  test("400: Should return 'Bad request' when the patch has a malformed body", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Bad request' when the patch is not a number", () => {
+    const patchedArticle = {
+      votes: "banana",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Bad request' when the article_id is invalid", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/banana")
+      .send(patchedArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/999")
+      .send(patchedArticle)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Article_id Not Found");
       });
   });
 });
