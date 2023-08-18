@@ -413,10 +413,10 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
-  test("400: Should return 'Bad request' when the patch is not a number", () => {
+  test("400: Should return 'Bad Request' when the patch is not a number", () => {
     const patchedArticle = {
       votes: "banana",
     };
@@ -426,7 +426,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("400: Should return 'Bad request' when the article_id is invalid", () => {
@@ -437,7 +437,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
