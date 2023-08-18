@@ -12,7 +12,8 @@ exports.getArticleById = (request, response, next) => {
     });
 };
 exports.getAllArticles = (request, response, next) => {
-  selectArticles()
+  const { topic, sort_by, order } = request.query;
+  selectArticles(topic, sort_by, order)
     .then((articles) => {
       response.status(200).send({ articles });
     })

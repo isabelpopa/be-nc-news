@@ -146,7 +146,7 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test("Articles should be sorted by date in descending order", () => {
+  test("Articles should be sorted by date as default, in descending order", () => {
     return request(app)
       .get("/api/articles")
       .then(({ body }) => {
@@ -162,6 +162,79 @@ describe("GET /api/articles", () => {
         articles.forEach((article) => {
           expect(article).not.toHaveProperty("body");
         });
+      });
+  });
+});
+describe("FEATURE: GET /api/articles (queries)", () => {
+  test("Articles should be filtered by topic=mitch, sorted by author and ordered ascending ", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=author&order=asc")
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("author", { descending: false });
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("topic", "mitch");
+        });
+        expect(articles[0]).toStrictEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            comment_count: "11",
+            topic: "mitch",
+            votes: 100,
+            author: "butter_bridge",
+            created_at: "2020-07-09T20:11:00.000Z",
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        })
+      });
+  });
+  test("Articles should be filtered by topic=cats, sorted by votes and ordered descending by default ", () => {
+    return request(app)
+      .get("/api/articles?topic=cats&sort_by=votes")
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("votes", { descending: true });
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("topic", "cats");
+        });
+        expect(articles[0]).toStrictEqual({
+          article_id: 5,
+          votes: 0,
+          comment_count: "2",
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          topic: "cats",
+          author: "rogersop",
+          created_at: "2020-08-03T13:14:00.000Z",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        })
+      });
+  });
+  test("400: responds with 400 and 'Bad sort_by request'", () => {
+    return request(app)
+      .get("/api/articles?sort_by=banana")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad sort_by request");
+      });
+  });
+  test("400: responds with 400 and 'Bad topic request'", () => {
+    return request(app)
+      .get("/api/articles?topic=banana")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad topic request");
+      });
+  });
+  test("404: responds with 404 and 'Not Found' when topic is valid but not found", () => {
+    return request(app)
+      .get("/api/articles?topic=coding")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not Found");
       });
   });
 });
