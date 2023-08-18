@@ -95,13 +95,13 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
-  test("400: responds with a status of 400 and a custom message of Bad request", () => {
+  test("400: responds with a status of 400 and a custom message of Bad Request", () => {
     return request(app)
       .get("/api/articles/banana")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: responds with a status of 404 and a custom message of Article_id Not Found", () => {
@@ -210,13 +210,13 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
-  test("400: responds with a status of 400 and a custom message of Bad request", () => {
+  test("400: responds with a status of 400 and a custom message of Bad Request", () => {
     return request(app)
       .get("/api/articles/banana/comments")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: responds with a status of 404 and a custom message of Article_id Not Found", () => {
@@ -263,7 +263,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("400: Should return 'Username Not Found' when the comment is missing username field", () => {
@@ -292,7 +292,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Comment Not Found");
       });
   });
-  test("400: Should return 'Bad request' when the article_id is invalid", () => {
+  test("400: Should return 'Bad Request' when the article_id is invalid", () => {
     const newComment = {
       body: "The answer is doughnuts",
       username: "butter_bridge",
@@ -303,7 +303,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
@@ -321,6 +321,26 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: responds with a status of 204", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("404: Should return 'Not Found' when comment_id is out of range", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Comment_id Not Found");
+      });
+  });
+  test("400: Should return 'Bad Request' when the comment_id is an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad Request");
 describe("PATCH /api/articles/:article_id", () => {
   test("200: responds with a status of 200 and the updated article object that has been patched", () => {
     const patchedArticle = { inc_votes: 10 };
