@@ -41,7 +41,7 @@ exports.patchArticle = (article_id, patchedArticle) => {
     if (!inc_votes || !article_id) {
       return Promise.reject({
         status: 400,
-        msg: "Bad request",
+        msg: "Bad Request",
       });
     }
   return db.query(queryStr).then(({ rows }) => {
