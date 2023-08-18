@@ -95,13 +95,13 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
-  test("400: responds with a status of 400 and a custom message of Bad request", () => {
+  test("400: responds with a status of 400 and a custom message of Bad Request", () => {
     return request(app)
       .get("/api/articles/banana")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: responds with a status of 404 and a custom message of Article_id Not Found", () => {
@@ -210,13 +210,13 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
-  test("400: responds with a status of 400 and a custom message of Bad request", () => {
+  test("400: responds with a status of 400 and a custom message of Bad Request", () => {
     return request(app)
       .get("/api/articles/banana/comments")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: responds with a status of 404 and a custom message of Article_id Not Found", () => {
@@ -263,7 +263,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("400: Should return 'Username Not Found' when the comment is missing username field", () => {
@@ -292,7 +292,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Comment Not Found");
       });
   });
-  test("400: Should return 'Bad request' when the article_id is invalid", () => {
+  test("400: Should return 'Bad Request' when the article_id is invalid", () => {
     const newComment = {
       body: "The answer is doughnuts",
       username: "butter_bridge",
@@ -303,7 +303,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad request");
+        expect(msg).toBe("Bad Request");
       });
   });
   test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
@@ -321,11 +321,11 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
 describe("GET /api/users", () => {
   test("200: responds with a status of 200", () => {
     return request(app).get("/api/users").expect(200);
   });
-
   test("200: responds with an array of users on the body", () => {
     return request(app)
       .get("/api/users")
@@ -349,8 +349,107 @@ describe("GET /api/users", () => {
       const { msg } = body;
       expect(msg).toBe("Not Found");
     });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: responds with a status of 204", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("404: Should return 'Not Found' when comment_id is out of range", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Comment_id Not Found");
+      });
+  });
+  test("400: Should return 'Bad Request' when the comment_id is an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad Request");
+      
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: responds with a status of 200 and the updated article object that has been patched", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 110,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("200: responds with the patched votes, when subtracting a value", () => {
+    const patchedArticle = { inc_votes: -50 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(50);
+      });
+  });
+  test("400: Should return 'Bad request' when the patch has a malformed body", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Bad request' when the patch is not a number", () => {
+    const patchedArticle = {
+      votes: "banana",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchedArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Should return 'Bad request' when the article_id is invalid", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/banana")
+      .send(patchedArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: Should return 'Article_id Not Found' when the article_id is out of range", () => {
+    const patchedArticle = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/999")
+      .send(patchedArticle)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Article_id Not Found");
+      });
   });
 });
+      
 describe("ALL /notapath", () => {
   test("404: responds with a status of 404 and a custom message when the path is not found", () => {
     return request(app)

@@ -8,10 +8,12 @@ const { getAllApiEndpoints } = require("./controllers/api.controllers");
 const {
   getArticleById,
   getAllArticles,
+  patchArticleById
 } = require("./controllers/articles.controllers");
 const {
   getAllCommentsByArticleId,
   postComment,
+  deleteCommentById
 } = require("./controllers/comments.controllers");
 const { getAllUsers } = require("./controllers/users.controllers");
 
@@ -19,19 +21,23 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/api", getAllApiEndpoints);
+
 app.get("/api/topics", getAllTopics);
 
-app.get("/api", getAllApiEndpoints);
+app.get("/api/articles", getAllArticles);
 
 app.get("/api/users", getAllUsers);
 
 app.get("/api/articles/:article_id", getArticleById);
 
-app.get("/api/articles", getAllArticles);
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.get("/api/articles/:article_id/comments", getAllCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.use((_, response) => {
   response.status(404).send({ msg: "Not Found" });
