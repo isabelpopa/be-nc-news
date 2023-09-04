@@ -54,4 +54,4 @@ app.use((err, request, response, next) => {
   response.status(500).send({ msg: err });
 });
 
-module.exports = { app };
+module.exports =  app;

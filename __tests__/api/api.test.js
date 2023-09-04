@@ -1,5 +1,5 @@
 const { seed } = require("../../db/seeds/seed");
-const { app } = require("../../app");
+const app = require("../../app");
 const request = require("supertest");
 const connection = require("../../db/connection");
 const testData = require("../../db/data/test-data");
